@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# Single service ./check_egi_ops -s <site> -x <service> -r <report>
+
+# Done using JQ package, a tool like sed for JSON data => http://stedolan.github.io/jq/
+
+usage () {
+        echo "Usage: ./check_egi_ops -s <site> -x <service1[,service2,...]> -r <report>"
+}
+
+# Check if the command has 3 flags and 3 arguments at least. Flavour it's not mandatory.
+if [[ $# -lt 6 ]]; then usage; exit 0; fi
+
+while getopts ":s:x:r::h:" arg; do
+    case "$arg" in
+        h) usage; exit 0 ;;
+        s) site=${OPTARG} ;;
+        x) services=${OPTARG} ;;
+        r) report=${OPTARG} ;;
+        #*) usage; exit 1 ;;
+    esac
+done
+
+# Option to pass an array of services
+for s in $(echo $services | tr "," " "); do
+    out2=""
+    # Get JSON content using input arguments
+    json=$(wget -qO - "http://argo.egi.eu/lavoisier/status_report-endpoints?site=$site&service=$s&report=$report&accept=json")
+
+    if [[ $(echo $json) == "" || $(echo $json | grep "Failed to load topology") != "" ]]; then
+            echo "ATTENTION: It seems that the dashboard server is failing."
+            exit 3;
+    # If there is no error, works normally
+    else
+        hosts=$(echo $json | jq -r '.root[].group[].name')
+
+        for h in $hosts; do
+            hostStatus=$(echo $json | jq -r '.root[].group[] | select(.name=="'$h'").status | sort_by(.timestamp) | reverse[0].value')
+
+            if [[ $hostStatus != 'OK' ]]; then
+                #json2=$(wget -qO - "http://argo.egi.eu/lavoisier/status_report-metrics?site=$site&service=$s&endpoint=$h&report=$report&accept=json")
+                shortUrl=$(curl --silent --data-urlencode "signature=e5a840463d" --data-urlencode "action=shorturl" --data-urlencode "format=simple" --data-urlencode "url=http://argo.egi.eu/lavoisier/status_report-metrics?site=$site&service=$s&endpoint=$h&report=$report&accept=html" http://u.pic.es/yourls-api.php)
+                out2=$out2"$h: <a target='_blank' href='$shortUrl'>$hostStatus</a>\n"
+
+                #metrics=$(echo $json2 | jq -r '.root[].group[].name')
+                #for m in $metrics; do
+                #    metricStatus=$(echo $metrics | jq -r '.root[].group[] | select(.name=="'$m'").status | sort_by(.timestamp) | reverse[0].value')
+                #    out2="$m: $metricStatus\n"$out2
+                #done
+            else
+                out2=$out2"$h: $hostStatus\n"
+            fi
+        done
+
+        if [[ $(echo $out2 | grep "OK") != "" ]]; then
+            serviceStatus="OK"
+        elif [[ $(echo $out2 | grep "CRITICAL") != "" ]]; then
+            serviceStatus="CRITICAL"
+        else
+            serviceStatus="WARNING"
+        fi
+
+        # General output for service
+        fl=$fl"$s: $serviceStatus // " # Firstline of results. We output this to be seen on the one line output of nagios
+        out=$out"$s\n"$out2"\n"
+    fi
+done
+
+######################################################################################
+# From here, all conditions and checks to print the results and send the exit status #
+######################################################################################
+
+# Firstline nagios output. We cut the last 4 characters for a good printing.
+echo -e "${fl%????}"
+
+# Output message
+echo -e "\nHOSTS\n======"
+# Output without two extra newlines at the end
+echo -e "${out%????}"
+
+# Check and set the global status => We'll find a better way in future versions
+if [[ `echo -e "$fl" | grep ": CRITICAL"` != "" ]]; then exit=2 # There is a Critical
+elif [[ `echo -e "$fl" | grep ": WARNING"` != "" ]]; then exit=1 # There is a Warning
+elif [[ `echo -e "$fl" | grep ": OK"` != "" ]]; then exit=0
+else exit=3 # Any other option will send an Unknown
+fi
+
+# Send exit code
+exit $exit

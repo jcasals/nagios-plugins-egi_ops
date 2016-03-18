@@ -28,7 +28,7 @@ $ yum install nagios-plugins-egi_ops
 ```
 $ /usr/lib64/nagios/plugins/check_egi_ops -s <site> -x <service1[,service2,...]> -r <report>
 ```
-As you can see it has four parameters.
+As you can see it has four parameters. 
 - Site (-s), service(s) (-x) and report type (-r).
 
 You can see an example of how it works by running it on your command line:
@@ -66,7 +66,7 @@ define command {
 ```
 
 #### Optional Setup for Nagios
-We tried to add a little more information to the Nagios output, so we wanted to add links that points out to the errors, in case it was an error. We found there are some characters not admitted, and that the HTML is disabled in the output.
+We tried to add a little more information to the Nagios output, so we wanted to add links that points out to the errors, in case it was an error. We found there are some characters not admitted, and that the HTML is disabled in the output. 
 
 To change this you have to modify two files.
 
@@ -80,3 +80,4 @@ escape_html_tags=0
 # illegal_object_name_chars=`~!$%^&*|'"<>?,()=
 illegal_object_name_chars=`~!$%^&*|'"?,()=
 ```
+
