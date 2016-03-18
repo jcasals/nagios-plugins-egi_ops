@@ -55,13 +55,13 @@ srm.pic.es: OK
 ### Setup for Nagios
 To add the plugin to your Nagios System you just have to create a command as you usually do with other plugins. A sample of command line input on the NagiosQL setup can be:
 ```
-$USER1$/check_lcgsam -v $ARG1$ -p $ARG2$ -s $ARG3$ -f $ARG4$
+$USER1$/check_egi_ops -s $ARG1$ -x $ARG2$ -r $ARG3$
 ```
 Or if you prefer, you can create this command on your *commands.cfg* file:
 ```
 define command {
-    command_name    check_lcgsam
-    command_line    $USER1$/check_lcgsam -v $ARG1$ -p $ARG2$ -s $ARG3$ -f $ARG4$
+    command_name    check_egi_ops
+    command_line    $USER1$/check_egi_ops -s $ARG1$ -x $ARG2$ -r $ARG3$
 }
 ```
 
