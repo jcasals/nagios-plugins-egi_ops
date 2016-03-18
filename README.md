@@ -21,7 +21,7 @@ It consists on a Bash script and the only requirement is to have [JQ](http://ste
 ### Installation
 You just have to install it via RPM and, if you don't have JQ on your server, it will install it as requirement.
 ```
-$ yum install nagios-plugins-egi_ops
+$ rpm -i nagios-plugins-egi_ops-1.0.0-1.el6.x86_64
 ```
 
 ### Usage
