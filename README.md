@@ -9,7 +9,7 @@ This check uses the information from the ARGO API and parses it and prints out t
 ### Authors
 Jordi Casals ([PIC](http://www.pic.es)).
 
-Contact: jcasals (at) pic (dot) es
+Contact: jcasals@pic.es
 
 ### Changelog
 *Fri Mar 18 2016*<br>
