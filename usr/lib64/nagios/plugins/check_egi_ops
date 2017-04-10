@@ -17,7 +17,6 @@ while getopts ":s:x:r::h:" arg; do
         s) site=${OPTARG} ;;
         x) services=${OPTARG} ;;
         r) report=${OPTARG} ;;
-        #*) usage; exit 1 ;;
     esac
 done
 
@@ -32,23 +31,16 @@ for s in $(echo $services | tr "," " "); do
             exit 3;
     # If there is no error, works normally
     else
-        hosts=$(echo $json | jq -r '.root[].group[].name')
+        hosts=$(echo $json | jq -r '.root[].name')
 
         for h in $hosts; do
-            hostStatus=$(echo $json | jq -r '.root[].group[] | select(.name=="'$h'").status | sort_by(.timestamp) | reverse[0].value')
+            hostStatus=$(echo $json | jq -r '.root[] | select(.name=="'$h'").group | sort_by(.timestamp) | reverse[0].value')
 
             if [[ $hostStatus != 'OK' ]]; then
-                #json2=$(wget -qO - "http://argo.egi.eu/lavoisier/status_report-metrics?site=$site&service=$s&endpoint=$h&report=$report&accept=json")
                 shortUrl=$(curl --silent --data-urlencode "signature=e5a840463d" --data-urlencode "action=shorturl" --data-urlencode "format=simple" --data-urlencode "url=http://argo.egi.eu/lavoisier/status_report-metrics?site=$site&service=$s&endpoint=$h&report=$report&accept=html" http://u.pic.es/yourls-api.php)
                 out2=$out2"$h: <a target='_blank' href='$shortUrl'>$hostStatus</a>\n"
-
-                #metrics=$(echo $json2 | jq -r '.root[].group[].name')
-                #for m in $metrics; do
-                #    metricStatus=$(echo $metrics | jq -r '.root[].group[] | select(.name=="'$m'").status | sort_by(.timestamp) | reverse[0].value')
-                #    out2="$m: $metricStatus\n"$out2
-                #done
             else
-                out2=$out2"$h: $hostStatus\n"
+                out2="$h: $hostStatus\n"$out2
             fi
         done
 
@@ -62,7 +54,7 @@ for s in $(echo $services | tr "," " "); do
 
         # General output for service
         fl=$fl"$s: $serviceStatus // " # Firstline of results. We output this to be seen on the one line output of nagios
-        out=$out"$s\n"$out2"\n"
+        out=$out"$s\n"$out2
     fi
 done
 
@@ -75,8 +67,7 @@ echo -e "${fl%????}"
 
 # Output message
 echo -e "\nHOSTS\n======"
-# Output without two extra newlines at the end
-echo -e "${out%????}"
+echo -e $out
 
 # Check and set the global status => We'll find a better way in future versions
 if [[ `echo -e "$fl" | grep ": CRITICAL"` != "" ]]; then exit=2 # There is a Critical
