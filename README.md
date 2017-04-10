@@ -9,7 +9,7 @@ This check uses the information from the ARGO API and parses it and prints out t
 ### Authors
 Jordi Casals ([PIC](http://www.pic.es)).
 
-Contact: jcasals (at) pic (dot) es
+Contact: jcasals@pic.es
 
 ### Changelog
 *Fri Mar 18 2016*<br>
@@ -72,7 +72,7 @@ We tried to add a little more information to the Nagios output, so we wanted to 
 
 To change this you have to modify two files.
 
-***/usr/local/nagios/etc/cgi.cfg*** *or your equivalent cgi.cfg*
+***/usr/local/nagios/etc/cgi.cfg*** *or your equivalent cgi.cfg (icinga, thruk, etc)*
 ```
 # escape_html_tags=1
 escape_html_tags=0
