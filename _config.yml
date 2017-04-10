@@ -1,0 +1,8 @@
+title: Nagios Plugins EGI OPS
+description: This is a Nagios plugin to check EGI OPS Test in the new ARGO platform
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-slate
+
+gems:
+  - jekyll-mentions
