@@ -12,8 +12,8 @@ Jordi Casals ([PIC](http://www.pic.es)).
 Contact: jcasals@pic.es
 
 ### Changelog
-*Fri Mar 18 2016*<br>
-**1.1.0** Modified main script to make it work with new ARGO output.
+*Mon Apr 10 2017*<br>
+**1.1.0** Modified main script to make it work with new ARGO output.<br>
 *Fri Mar 18 2016*<br>
 **1.0.0** First Release!
 
